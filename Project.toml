@@ -3,6 +3,12 @@ uuid = "f1887b2c-1188-4ed8-bdb2-c2d92e877ee6"
 authors = ["Kyle Brown <kylejbrown17@gmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
+GraphUtils = "5d4bc1c0-0fb7-11e9-3252-b1aa07358cab"
+VoronoiCells = "e3e34ffb-84e9-5012-9490-92c94d0c60a4"
+VoronoiDelaunay = "72f80fcb-8c52-57d9-aff0-40c1a3526986"
+
 [compat]
 julia = "1.1"
 
