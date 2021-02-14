@@ -1,28 +1,28 @@
 name: CI
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - master
 jobs:
   test:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         version:
-          - '1.1'
-          - '1.5'
-          - 'nightly'
+          # - '1.1'
+          - '1.4'
+          # - 'nightly'
         os:
           - ubuntu-latest
-          - macOS-latest
-          - windows-latest
+          # - macOS-latest
+          # - windows-latest
         arch:
           - x64
-          - x86
-        exclude:
-          - os: macOS-latest
-            arch: x86
+          # - x86
+        # exclude:
+        #   - os: macOS-latest
+        #     arch: x86
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
@@ -39,6 +39,11 @@ jobs:
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
+      - run: julia -e 'using Pkg; pkg"registry add https://github.com/JuliaRegistries/General"'
+      - uses: webfactory/ssh-agent@v0.4.1 # Use to add private ssh key to match deploy key
+        with:
+          ssh-private-key: ${{ secrets.JULIA_PACKAGE_REGISTRY_KEY }}
+      - run: julia -e 'using Pkg; pkg"registry add git@github.com:kylejbrown17/JuliaPackageRegistry.git"'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
   docs:
@@ -49,6 +54,11 @@ jobs:
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1'
+      - run: julia -e 'using Pkg; pkg"registry add https://github.com/JuliaRegistries/General"'
+      - uses: webfactory/ssh-agent@v0.4.1 # Use to add private ssh key to match deploy key
+        with:
+          ssh-private-key: ${{ secrets.JULIA_PACKAGE_REGISTRY_KEY }}
+      - run: julia -e 'using Pkg; pkg"registry add git@github.com:kylejbrown17/JuliaPackageRegistry.git"'
       - run: |
           julia --project=docs -e '
             using Pkg
@@ -57,7 +67,7 @@ jobs:
       - run: |
           julia --project=docs -e '
             using Documenter: doctest
-            using CentroidalVoronoiController
+            using CentroidalVoronoiController 
             doctest(CentroidalVoronoiController)'
       - run: julia --project=docs docs/make.jl
         env:
